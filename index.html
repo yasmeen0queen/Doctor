@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medical Diagnostic Device</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #7adc8e; /* Hospital Green */
+    }
+    .container {
+      text-align: center;
+      padding: 20px;
+      border: 2px solid #000000; /* Black border */
+      border-radius: 10px; /* Rounded corners */
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Shadow effect */
+      background-color: #ffffff; /* White background */
+    }
+    textarea {
+      width: 80%;
+      max-width: 600px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #response {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      background-color: #f9f9f9;
+      word-wrap: break-word;
+      max-width: 600px;
+      margin: 20px auto 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Medical Diagnostic Device</h1>
+    <h2>Input Symptoms</h2>
+    
+    <!-- Input for symptoms -->
+    <textarea id="symptomsInput" rows="4" placeholder="Enter your symptoms here..."></textarea><br><br>
+    
+    <!-- Button to submit symptoms -->
+    <button id="submitBtn">Get Diagnosis</button>
+
+    <!-- Placeholder for response -->
+    <div id="response"></div>
+  </div>
+
+  <script>
+    // Handle button click
+    document.getElementById('submitBtn').addEventListener('click', async () => {
+      const symptoms = document.getElementById('symptomsInput').value.trim();
+      const responseDiv = document.getElementById('response');
+
+      if (!symptoms) {
+        responseDiv.textContent = 'Please enter some symptoms.';
+        return;
+      }
+
+      try {
+        // Use a proxy to bypass CORS issues
+        const proxyUrl = "https://cors-anywhere.herokuapp.com/";
+        const apiUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(symptoms)}&format=json`;
+        const response = await fetch(proxyUrl + apiUrl);
+        const data = await response.json();
+        
+        if (data.AbstractText) {
+          responseDiv.textContent = `Diagnosis: ${data.AbstractText}`;
+        } else if (data.RelatedTopics && data.RelatedTopics.length > 0) {
+          responseDiv.textContent = `Related Info: ${data.RelatedTopics[0].Text}`;
+        } else {
+          responseDiv.textContent = 'Sorry, no relevant information found.';
+        }
+      } catch (error) {
+        responseDiv.textContent = 'Error: Could not get a response from the server.';
+      }
+    });
+  </script>
+</body>
+</html>
